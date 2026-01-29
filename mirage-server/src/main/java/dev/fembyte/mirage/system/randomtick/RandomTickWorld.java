@@ -6,6 +6,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 public final class RandomTickWorld {
     private static final class SectionCache {
         private int count;
@@ -13,7 +16,7 @@ public final class RandomTickWorld {
     }
 
     private final ServerLevel level;
-    private final java.util.Map<LevelChunk, SectionCache> sectionCache = new java.util.WeakHashMap<>();
+    private final Map<LevelChunk, SectionCache> sectionCache = new WeakHashMap<>();
 
     private long lastGameTime = Long.MIN_VALUE;
     private boolean schedulerEnabled;
