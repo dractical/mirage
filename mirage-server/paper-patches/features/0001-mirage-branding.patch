@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: dractical <dracticalrblx@gmail.com>
+Date: Thu, 29 Jan 2026 09:01:31 -0500
+Subject: [PATCH] mirage branding
+
+
+diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
+index 9f4d73fd321f6f0cd19fdd1b63068d2ea6c0816b..8ed2ce685b0ef5f1ebe06d2e5cfa7f345b9e15f4 100644
+--- a/src/main/java/com/destroystokyo/paper/Metrics.java
++++ b/src/main/java/com/destroystokyo/paper/Metrics.java
+@@ -593,7 +593,7 @@ public class Metrics {
+             boolean logFailedRequests = config.getBoolean("logFailedRequests", false);
+             // Only start Metrics, if it's enabled in the config
+             if (config.getBoolean("enabled", true)) {
+-                Metrics metrics = new Metrics("Paper", serverUUID, logFailedRequests, Bukkit.getLogger());
++                Metrics metrics = new Metrics("Mirage", serverUUID, logFailedRequests, Bukkit.getLogger()); // Mirage
+ 
+                 metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
+                     String minecraftVersion = Bukkit.getVersion();
+@@ -607,11 +607,11 @@ public class Metrics {
+                 final String implVersion = org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion();
+                 if (implVersion != null) {
+                     final String buildOrHash = implVersion.substring(implVersion.lastIndexOf('-') + 1);
+-                    paperVersion = "git-Paper-%s-%s".formatted(Bukkit.getServer().getMinecraftVersion(), buildOrHash);
++                    paperVersion = "git-Mirage-%s-%s".formatted(Bukkit.getServer().getMinecraftVersion(), buildOrHash); // Mirage
+                 } else {
+                     paperVersion = "unknown";
+                 }
+-                metrics.addCustomChart(new Metrics.SimplePie("paper_version", () -> paperVersion));
++                metrics.addCustomChart(new Metrics.SimplePie("mirage_version", () -> paperVersion));
+ 
+                 metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
+                     Map<String, Map<String, Integer>> map = new HashMap<>();
+diff --git a/src/main/java/io/papermc/paper/command/PaperVersionCommand.java b/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
+index bfacb856623b5cb6af4f1b65ee89200cdfb1ef13..22f83fafa3725b3b7d3a26a1a810e1fa42841f36 100644
+--- a/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
++++ b/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
+@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
+ import com.mojang.brigadier.suggestion.Suggestions;
+ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+ import com.mojang.brigadier.tree.LiteralCommandNode;
++import dev.fembyte.mirage.MirageVersionFetcher;
+ import io.papermc.paper.command.brigadier.CommandSourceStack;
+ import io.papermc.paper.command.brigadier.Commands;
+ import io.papermc.paper.plugin.configuration.PluginMeta;
+@@ -45,7 +46,7 @@ public class PaperVersionCommand {
+     private static final Component FAILED_TO_FETCH = Component.text("Could not fetch version information!", NamedTextColor.RED);
+     private static final Component FETCHING = Component.text("Checking version, please wait...", NamedTextColor.WHITE, TextDecoration.ITALIC);
+ 
+-    private final VersionFetcher versionFetcher = CraftMagicNumbers.INSTANCE.getVersionFetcher();
++    private final VersionFetcher versionFetcher = new MirageVersionFetcher(); // Mirage
+     private CompletableFuture<ComputedVersion> computedVersion = CompletableFuture.completedFuture(new ComputedVersion(Component.empty(), -1)); // Precompute-- someday move that stuff out of bukkit
+ 
+     public static LiteralCommandNode<CommandSourceStack> create() {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index cfa4c67e80a50c9556f66529910c2783d3350b54..6846e912c41c4b15736a280b0b9f3e86e84fac53 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -13,6 +13,7 @@ import com.mojang.logging.LogUtils;
+ import com.mojang.serialization.Dynamic;
+ import com.mojang.serialization.JavaOps;
+ import com.mojang.serialization.JsonOps;
++import dev.fembyte.mirage.MirageVersionFetcher;
+ import io.papermc.paper.adventure.AdventureCodecs;
+ import io.papermc.paper.adventure.PaperAdventure;
+ import io.papermc.paper.registry.RegistryKey;
+@@ -487,7 +488,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     @Override
+     public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
+-        return new com.destroystokyo.paper.PaperVersionFetcher();
++        return new MirageVersionFetcher(); // Mirage
+     }
+ 
+     @Override
