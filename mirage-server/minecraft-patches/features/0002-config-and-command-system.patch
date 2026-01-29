@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: dractical <dracticalrblx@gmail.com>
+Date: Thu, 29 Jan 2026 11:39:51 -0500
+Subject: [PATCH] config and command system
+
+
+diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
+index 094d2d528cb74b8f1d277cd780bba7f438dbe764..a1545c4e50fcb09033d588c62f7829da7d5f5607 100644
+--- a/net/minecraft/server/Main.java
++++ b/net/minecraft/server/Main.java
+@@ -19,6 +19,8 @@ import joptsimple.OptionParser;
+ import joptsimple.OptionSet;
+ import joptsimple.OptionSpec;
+ import joptsimple.util.PathConverter;
++import dev.fembyte.mirage.config.ConfigManager;
++import dev.fembyte.mirage.config.modules.ConfigSystemConfig;
+ import net.minecraft.CrashReport;
+ import net.minecraft.DefaultUncaughtExceptionHandler;
+ import net.minecraft.SharedConstants;
+@@ -100,6 +102,16 @@ public class Main {
+                 writePidFile(path);
+             }
+ 
++            // Mirage start - config
++            Path mirageConfigPath = Paths.get("config", "mirage-global.yml");
++            ConfigManager mirageConfig = new ConfigManager(mirageConfigPath, 1, "dev.fembyte.mirage.config.modules");
++            mirageConfig.setGlobal();
++            mirageConfig.load();
++            if (mirageConfig.get(ConfigSystemConfig.class).watchFileChanges) {
++                mirageConfig.startWatching();
++            }
++            // Mirage end - config
++
+             CrashReport.preload();
+             if (optionSet.has("jfrProfile")) { // CraftBukkit
+                 JvmProfiler.INSTANCE.start(Environment.SERVER);
+diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
+index eb06d8f012684845146429832e977e6c1ddcd62b..c3b5784159813700032217e8e8f820fddacb09ce 100644
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -256,6 +256,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         org.spigotmc.SpigotConfig.init((java.io.File) this.options.valueOf("spigot-settings"));
+         org.spigotmc.SpigotConfig.registerCommands();
+         // Spigot end
++
+         io.papermc.paper.util.ObfHelper.INSTANCE.getClass(); // Paper - load mappings for stacktrace deobf and etc.
+         // Paper start - initialize global and world-defaults configuration
+         this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
+@@ -275,6 +276,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
+         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+ 
++        // Mirage - commands
++        dev.fembyte.mirage.command.MirageCommands.registerCommands(this);
++
+         // this.worldData.setGameType(properties.gameMode.get()); // CraftBukkit - moved to world loading
+         LOGGER.info("Default game type: {}", properties.gameMode.get());
+         // Paper start - Unix domain socket support
