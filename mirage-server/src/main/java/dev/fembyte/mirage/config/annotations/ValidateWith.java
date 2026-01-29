@@ -1,6 +1,7 @@
 package dev.fembyte.mirage.config.annotations;
 
 import dev.fembyte.mirage.config.validation.ConfigValidator;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

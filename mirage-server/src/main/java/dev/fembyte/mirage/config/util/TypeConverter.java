@@ -2,12 +2,7 @@ package dev.fembyte.mirage.config.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 public final class TypeConverter {
     private TypeConverter() {
@@ -123,7 +118,7 @@ public final class TypeConverter {
     }
 
     private static Set<?> toSet(Object raw, Type genericType) {
-        List<?> list = (List<?>) toList(raw, genericType);
+        List<?> list = toList(raw, genericType);
         return new LinkedHashSet<>(list);
     }
 

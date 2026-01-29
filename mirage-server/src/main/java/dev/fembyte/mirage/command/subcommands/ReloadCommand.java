@@ -9,11 +9,11 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 
 @MirageCommand(
-    name = "reload",
-    description = "Reload Mirage configuration",
-    usage = "reload",
-    permission = "mirage.command.reload",
-    order = 10
+        name = "reload",
+        description = "Reload Mirage configuration",
+        usage = "reload",
+        permission = "mirage.command.reload",
+        order = 10
 )
 public final class ReloadCommand implements MirageSubcommand {
     @Override

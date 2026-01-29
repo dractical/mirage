@@ -19,8 +19,8 @@ public final class MigrationRegistry {
         boolean migrated = false;
         int current = fromVersion;
         List<ConfigMigration> ordered = migrations.stream()
-            .sorted(Comparator.comparingInt(ConfigMigration::fromVersion))
-            .toList();
+                .sorted(Comparator.comparingInt(ConfigMigration::fromVersion))
+                .toList();
         for (ConfigMigration migration : ordered) {
             if (migration.fromVersion() != current) {
                 continue;

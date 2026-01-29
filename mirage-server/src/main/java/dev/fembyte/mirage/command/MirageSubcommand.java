@@ -1,7 +1,8 @@
 package dev.fembyte.mirage.command;
 
-import java.util.List;
 import org.bukkit.command.CommandSender;
+
+import java.util.List;
 
 public interface MirageSubcommand {
     int execute(CommandSender sender, String[] args);

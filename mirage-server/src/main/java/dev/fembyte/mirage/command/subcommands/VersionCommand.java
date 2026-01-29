@@ -6,7 +6,6 @@ import dev.fembyte.mirage.MirageVersionFetcher;
 import dev.fembyte.mirage.command.MirageSubcommand;
 import dev.fembyte.mirage.command.annotations.MirageCommand;
 import dev.fembyte.mirage.util.MirageText;
-import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,12 +14,14 @@ import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
+import java.util.concurrent.CompletableFuture;
+
 @MirageCommand(
-    name = "version",
-    description = "Show Mirage version information",
-    usage = "version",
-    permission = "mirage.command.version",
-    order = 20
+        name = "version",
+        description = "Show Mirage version information",
+        usage = "version",
+        permission = "mirage.command.version",
+        order = 20
 )
 public final class VersionCommand implements MirageSubcommand {
     private static final Component FETCHING = MirageText.mini("<gray><italic>Checking version, please wait...</italic></gray>");
@@ -57,7 +58,7 @@ public final class VersionCommand implements MirageSubcommand {
         }
 
         if (this.computedVersion.isCompletedExceptionally()
-            || System.currentTimeMillis() - this.computedVersion.resultNow().computedTime() > this.versionFetcher.getCacheTime()) {
+                || System.currentTimeMillis() - this.computedVersion.resultNow().computedTime() > this.versionFetcher.getCacheTime()) {
             this.computedVersion = fetchVersionMessage();
         }
 
@@ -68,16 +69,16 @@ public final class VersionCommand implements MirageSubcommand {
         return CompletableFuture.supplyAsync(() -> {
             Component header = MirageText.mini("<gradient:#71b7ff:#5af5a1><bold>Mirage</bold></gradient> <gray>version</gray>");
             Component message = Component.textOfChildren(
-                header,
-                Component.newline(),
-                Component.text(Bukkit.getVersionMessage(), NamedTextColor.WHITE),
-                Component.newline(),
-                this.versionFetcher.getVersionMessage()
+                    header,
+                    Component.newline(),
+                    Component.text(Bukkit.getVersionMessage(), NamedTextColor.WHITE),
+                    Component.newline(),
+                    this.versionFetcher.getVersionMessage()
             );
 
             Component clickable = message
-                .hoverEvent(Component.translatable("chat.copy.click", NamedTextColor.WHITE))
-                .clickEvent(ClickEvent.copyToClipboard(PlainTextComponentSerializer.plainText().serialize(message)));
+                    .hoverEvent(Component.translatable("chat.copy.click", NamedTextColor.WHITE))
+                    .clickEvent(ClickEvent.copyToClipboard(PlainTextComponentSerializer.plainText().serialize(message)));
 
             return new ComputedVersion(clickable, System.currentTimeMillis());
         });

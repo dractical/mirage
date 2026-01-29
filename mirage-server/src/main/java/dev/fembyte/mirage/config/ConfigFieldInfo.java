@@ -3,15 +3,16 @@ package dev.fembyte.mirage.config;
 import dev.fembyte.mirage.config.annotations.Validate;
 import dev.fembyte.mirage.config.annotations.ValidateWith;
 import dev.fembyte.mirage.config.validation.ConfigValidator;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
 public record ConfigFieldInfo(
-    Field field,
-    String key,
-    List<String> comments,
-    Validate validate,
-    ValidateWith validateWith
+        Field field,
+        String key,
+        List<String> comments,
+        Validate validate,
+        ValidateWith validateWith
 ) {
     public ConfigValidator<?> newValidator() {
         if (validateWith == null) {

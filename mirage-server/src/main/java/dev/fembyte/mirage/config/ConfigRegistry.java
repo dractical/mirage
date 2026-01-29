@@ -1,16 +1,13 @@
 package dev.fembyte.mirage.config;
 
-import dev.fembyte.mirage.config.annotations.Comment;
-import dev.fembyte.mirage.config.annotations.ConfigKey;
-import dev.fembyte.mirage.config.annotations.ConfigSpec;
-import dev.fembyte.mirage.config.annotations.Validate;
-import dev.fembyte.mirage.config.annotations.ValidateWith;
+import dev.fembyte.mirage.config.annotations.*;
 import dev.fembyte.mirage.config.util.KebabCase;
 import dev.fembyte.mirage.config.util.ReflectionUtil;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -27,10 +24,10 @@ public final class ConfigRegistry {
     public static ConfigRegistry scan(String basePackage) {
         List<ConfigModuleInfo> modules = new ArrayList<>();
         try (ScanResult scanResult = new ClassGraph()
-            .enableClassInfo()
-            .enableAnnotationInfo()
-            .acceptPackages(basePackage)
-            .scan()) {
+                .enableClassInfo()
+                .enableAnnotationInfo()
+                .acceptPackages(basePackage)
+                .scan()) {
             ClassInfoList classes = scanResult.getClassesWithAnnotation(ConfigSpec.class.getName());
             for (ClassInfo classInfo : classes) {
                 Class<?> type = classInfo.loadClass();
@@ -39,29 +36,29 @@ public final class ConfigRegistry {
                 }
                 ConfigSpec annotation = type.getAnnotation(ConfigSpec.class);
                 String name = annotation.name().isEmpty()
-                    ? KebabCase.fromCamel(type.getSimpleName())
-                    : annotation.name();
+                        ? KebabCase.fromCamel(type.getSimpleName())
+                        : annotation.name();
                 String category = annotation.category().isEmpty()
-                    ? ""
-                    : KebabCase.fromCamel(annotation.category());
+                        ? ""
+                        : KebabCase.fromCamel(annotation.category());
                 ConfigModule instance = (ConfigModule) ReflectionUtil.newInstance(type);
                 ConfigModule defaults = (ConfigModule) ReflectionUtil.newInstance(type);
                 List<ConfigFieldInfo> fields = collectFields(type);
                 modules.add(new ConfigModuleInfo(
-                    type,
-                    instance,
-                    defaults,
-                    name,
-                    category,
-                    annotation.reloadable(),
-                    annotation.order(),
-                    fields
+                        type,
+                        instance,
+                        defaults,
+                        name,
+                        category,
+                        annotation.reloadable(),
+                        annotation.order(),
+                        fields
                 ));
             }
         }
         modules.sort(Comparator.comparing(ConfigModuleInfo::category, Comparator.nullsFirst(String::compareTo))
-            .thenComparingInt(ConfigModuleInfo::order)
-            .thenComparing(ConfigModuleInfo::name));
+                .thenComparingInt(ConfigModuleInfo::order)
+                .thenComparing(ConfigModuleInfo::name));
         return new ConfigRegistry(modules);
     }
 
@@ -77,8 +74,8 @@ public final class ConfigRegistry {
             }
             field.setAccessible(true);
             String key = field.isAnnotationPresent(ConfigKey.class)
-                ? field.getAnnotation(ConfigKey.class).value()
-                : KebabCase.fromCamel(field.getName());
+                    ? field.getAnnotation(ConfigKey.class).value()
+                    : KebabCase.fromCamel(field.getName());
             Comment comment = field.getAnnotation(Comment.class);
             List<String> comments = comment == null ? List.of() : List.of(comment.value());
             Validate validate = field.getAnnotation(Validate.class);

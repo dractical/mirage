@@ -10,27 +10,13 @@ import dev.fembyte.mirage.config.util.TypeConverter;
 import dev.fembyte.mirage.config.validation.ConfigValidator;
 import dev.fembyte.mirage.config.validation.ValidationResult;
 import dev.fembyte.mirage.config.validation.ValidationUtil;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.nio.file.*;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -120,8 +106,8 @@ public final class ConfigManager {
             Files.createDirectories(configPath.getParent());
             watchService = FileSystems.getDefault().newWatchService();
             configPath.getParent().register(watchService,
-                StandardWatchEventKinds.ENTRY_MODIFY,
-                StandardWatchEventKinds.ENTRY_CREATE);
+                    StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_CREATE);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Failed to start config watcher", ex);
             return;

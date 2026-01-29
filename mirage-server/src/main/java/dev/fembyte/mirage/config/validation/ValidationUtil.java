@@ -1,6 +1,7 @@
 package dev.fembyte.mirage.config.validation;
 
 import dev.fembyte.mirage.config.annotations.Validate;
+
 import java.util.Collection;
 import java.util.regex.Pattern;
 

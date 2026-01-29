@@ -5,11 +5,8 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,10 +28,10 @@ public final class MirageCommandRegistry {
         Map<String, MirageCommandNode> lookup = new HashMap<>();
         MirageCommandNode root = new MirageCommandNode(null);
         try (ScanResult scanResult = new ClassGraph()
-            .enableClassInfo()
-            .enableAnnotationInfo()
-            .acceptPackages(basePackage)
-            .scan()) {
+                .enableClassInfo()
+                .enableAnnotationInfo()
+                .acceptPackages(basePackage)
+                .scan()) {
             ClassInfoList classes = scanResult.getClassesWithAnnotation(MirageCommand.class.getName());
             for (ClassInfo classInfo : classes) {
                 Class<?> type = classInfo.loadClass();
@@ -44,15 +41,15 @@ public final class MirageCommandRegistry {
                 MirageCommand annotation = type.getAnnotation(MirageCommand.class);
                 MirageSubcommand handler = newInstance(type);
                 MirageSubcommandInfo info = new MirageSubcommandInfo(
-                    annotation.name(),
-                    annotation.parent(),
-                    annotation.description(),
-                    annotation.usage(),
-                    annotation.permission(),
-                    List.of(annotation.aliases()),
-                    List.of(annotation.completions()),
-                    annotation.order(),
-                    handler
+                        annotation.name(),
+                        annotation.parent(),
+                        annotation.description(),
+                        annotation.usage(),
+                        annotation.permission(),
+                        List.of(annotation.aliases()),
+                        List.of(annotation.completions()),
+                        annotation.order(),
+                        handler
                 );
                 subcommands.add(info);
                 MirageCommandNode node = new MirageCommandNode(info);
@@ -63,7 +60,7 @@ public final class MirageCommandRegistry {
             }
         }
         subcommands.sort(Comparator.comparingInt(MirageSubcommandInfo::order)
-            .thenComparing(MirageSubcommandInfo::name));
+                .thenComparing(MirageSubcommandInfo::name));
         for (MirageSubcommandInfo info : subcommands) {
             MirageCommandNode node = lookup.get(info.name().toLowerCase());
             MirageCommandNode parent;

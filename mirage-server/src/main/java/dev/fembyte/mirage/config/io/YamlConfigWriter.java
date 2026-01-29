@@ -1,10 +1,11 @@
 package dev.fembyte.mirage.config.io;
 
-import dev.fembyte.mirage.config.ConfigModuleInfo;
 import dev.fembyte.mirage.config.ConfigFieldInfo;
+import dev.fembyte.mirage.config.ConfigModuleInfo;
 import dev.fembyte.mirage.config.annotations.Comment;
 import dev.fembyte.mirage.config.annotations.Experimental;
 import dev.fembyte.mirage.config.util.KebabCase;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
@@ -125,10 +126,10 @@ public final class YamlConfigWriter {
             return "''";
         }
         boolean safe = value.matches("[A-Za-z0-9_./-]+")
-            && !value.contains(":")
-            && !value.startsWith("-")
-            && !value.startsWith("?")
-            && !value.startsWith("#");
+                && !value.contains(":")
+                && !value.startsWith("-")
+                && !value.startsWith("?")
+                && !value.startsWith("#");
         if (safe) {
             return value;
         }

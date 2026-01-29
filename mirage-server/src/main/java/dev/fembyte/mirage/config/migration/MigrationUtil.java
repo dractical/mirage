@@ -1,6 +1,7 @@
 package dev.fembyte.mirage.config.migration;
 
 import dev.fembyte.mirage.config.util.ConfigPath;
+
 import java.util.Map;
 
 public final class MigrationUtil {

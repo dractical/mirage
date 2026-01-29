@@ -3,6 +3,7 @@ package dev.fembyte.mirage.config.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class ReflectionUtil {
@@ -23,9 +24,7 @@ public final class ReflectionUtil {
         List<Field> fields = new ArrayList<>();
         Class<?> current = type;
         while (current != null && current != Object.class) {
-            for (Field field : current.getDeclaredFields()) {
-                fields.add(field);
-            }
+            Collections.addAll(fields, current.getDeclaredFields());
             current = current.getSuperclass();
         }
         return fields;

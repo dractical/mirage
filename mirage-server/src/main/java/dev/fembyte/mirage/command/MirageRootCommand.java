@@ -1,14 +1,11 @@
 package dev.fembyte.mirage.command;
 
 import dev.fembyte.mirage.util.MirageText;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 public final class MirageRootCommand extends Command {
     private final MirageCommandRegistry registry;
