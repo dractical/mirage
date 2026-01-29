@@ -10,8 +10,20 @@
 **mirage** is my personal fork of Paper, built alongside my [YouTube channel](https://www.youtube.com/@fembytee)
 and [Discord community](https://discord.com/invite/XYUU3GFsJz).
 
-This isn't a project trying to compete with large, general-purpose server cores.  
-It's a space to explore ideas, experiment freely, and ask unique questions about how Minecraft servers actually work.
+This isn't a project to compete with large and general-purpose server cores.
+It's more of a space to explore ideas, experiment, and ask uncomfortable questions about how Minecraft servers actually
+work.
+
+## Motivation
+
+> What if performance improvements didn't come from making things faster, but from changing what needs to happen in the
+> first place?
+
+Most server optimization focuses on squeezing more speed out of existing systems.  
+Mirage takes a different approach: questioning whether that work needs to exist at all.
+A lot of Mirage's performance gains don't come from clever tricks or micro-optimizations,
+they come from removing code, simplifying systems, and avoiding unnecessary work entirely.
+The end goal is a server that *feels* smooth, not just one that looks good on a profiler.
 
 ## Building
 
