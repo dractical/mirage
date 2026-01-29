@@ -10,4 +10,8 @@ public interface MirageSubcommand {
     default List<String> tabComplete(CommandSender sender, String[] args) {
         return List.of();
     }
+
+    default boolean runWhenHasChildren() {
+        return false;
+    }
 }

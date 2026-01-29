@@ -1,0 +1,104 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: dractical <dracticalrblx@gmail.com>
+Date: Thu, 29 Jan 2026 14:43:54 -0500
+Subject: [PATCH] budgeted random ticks
+
+
+diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
+index dc65503a2d785d64d37b76b0303f51cf66d9769a..941479779155ce42528e40cdc935eba947c903bf 100644
+--- a/net/minecraft/server/level/ServerLevel.java
++++ b/net/minecraft/server/level/ServerLevel.java
+@@ -922,16 +922,21 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+     // Paper start - optimise random ticking
+     private final ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom simpleRandom = new ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom(net.minecraft.world.level.levelgen.RandomSupport.generateUniqueSeed());
+ 
+-    private void optimiseRandomTick(final LevelChunk chunk, final int tickSpeed) {
++    // Mirage start - random tick overhaul
++    private int optimiseRandomTick(final LevelChunk chunk, final int tickSpeed, final float fluidChance, final float vineChance, final float snowyDirtChance) {
+         final LevelChunkSection[] sections = chunk.getSections();
+         final int minSection = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection((ServerLevel)(Object)this);
+         final ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom simpleRandom = this.simpleRandom;
+         final boolean doubleTickFluids = !ca.spottedleaf.moonrise.common.PlatformHooks.get().configFixMC224294();
++        final float clampedFluidChance = fluidChance <= 0.0f ? 0.0f : (fluidChance >= 1.0f ? 1.0f : fluidChance);
++        final float clampedVineChance = vineChance <= 0.0f ? 0.0f : (vineChance >= 1.0f ? 1.0f : vineChance);
++        final float clampedSnowyDirtChance = snowyDirtChance <= 0.0f ? 0.0f : (snowyDirtChance >= 1.0f ? 1.0f : snowyDirtChance);
+ 
+         final ChunkPos cpos = chunk.getPos();
+         final int offsetX = cpos.x << 4;
+         final int offsetZ = cpos.z << 4;
+ 
++        int tickingSections = 0;
+         for (int sectionIndex = 0, sectionsLen = sections.length; sectionIndex < sectionsLen; sectionIndex++) {
+             final int offsetY = (sectionIndex + minSection) << 4;
+             final LevelChunkSection section = sections[sectionIndex];
+@@ -939,6 +944,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+             if (!section.isRandomlyTickingBlocks()) {
+                 continue;
+             }
++            tickingSections++;
+ 
+             final ca.spottedleaf.moonrise.common.list.ShortList tickList = ((ca.spottedleaf.moonrise.patches.block_counting.BlockCountingChunkSection)section).moonrise$getTickingBlockList();
+ 
+@@ -953,6 +959,15 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+ 
+                 final int location = (int)tickList.getRaw(index) & 0xFFFF;
+                 final BlockState state = states.get(location);
++                final net.minecraft.world.level.block.Block block = state.getBlock();
++
++                if (clampedVineChance < 1.0f && isVineBlock(block) && simpleRandom.nextFloat() >= clampedVineChance) {
++                    continue;
++                }
++                if (clampedSnowyDirtChance < 1.0f && block instanceof net.minecraft.world.level.block.SpreadingSnowyDirtBlock
++                    && simpleRandom.nextFloat() >= clampedSnowyDirtChance) {
++                    continue;
++                }
+ 
+                 // do not use a mutable pos, as some random tick implementations store the input without calling immutable()!
+                 final BlockPos pos = new BlockPos((location & 15) | offsetX, ((location >>> (4 + 4)) & 15) | offsetY, ((location >>> 4) & 15) | offsetZ);
+@@ -961,15 +976,26 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+                 if (doubleTickFluids) {
+                     final FluidState fluidState = state.getFluidState();
+                     if (fluidState.isRandomlyTicking()) {
+-                        fluidState.randomTick((ServerLevel)(Object)this, pos, simpleRandom);
++                        if (clampedFluidChance >= 1.0f || simpleRandom.nextFloat() < clampedFluidChance) {
++                            fluidState.randomTick((ServerLevel)(Object)this, pos, simpleRandom);
++                        }
+                     }
+                 }
+             }
+         }
+ 
+-        return;
++        return tickingSections;
+     }
+     // Paper end - optimise random ticking
++    private static boolean isVineBlock(net.minecraft.world.level.block.Block block) {
++        return block instanceof net.minecraft.world.level.block.VineBlock
++            || block instanceof net.minecraft.world.level.block.WeepingVinesBlock
++            || block instanceof net.minecraft.world.level.block.WeepingVinesPlantBlock
++            || block instanceof net.minecraft.world.level.block.TwistingVinesBlock
++            || block instanceof net.minecraft.world.level.block.TwistingVinesPlantBlock
++            || block instanceof net.minecraft.world.level.block.CaveVines;
++    }
++    // Mirage end - random tick overhaul
+ 
+     public void tickChunk(LevelChunk chunk, int randomTickSpeed) {
+         final ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom simpleRandom = this.simpleRandom; // Paper - optimise random ticking
+@@ -989,7 +1015,16 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+ 
+         profilerFiller.popPush("tickBlocks");
+         if (randomTickSpeed > 0) {
+-            this.optimiseRandomTick(chunk, randomTickSpeed); // Paper - optimise random ticking
++            dev.fembyte.mirage.system.randomtick.RandomTickWorld randomTickWorld = dev.fembyte.mirage.system.randomtick.RandomTickSystem.get((ServerLevel)(Object)this);
++            dev.fembyte.mirage.system.randomtick.RandomTickDecision decision = randomTickWorld.decide(chunk, randomTickSpeed, this.getGameTime());
++            if (decision.schedulerEnabled()) {
++                if (decision.tickSpeed() > 0) {
++                    int sections = this.optimiseRandomTick(chunk, decision.tickSpeed(), decision.fluidChance(), decision.vineChance(), decision.snowyDirtChance()); // Paper - optimise random ticking
++                    randomTickWorld.record(chunk, decision, sections, this.getGameTime());
++                }
++            } else {
++                this.optimiseRandomTick(chunk, randomTickSpeed, 1.0f, 1.0f, 1.0f); // Paper - optimise random ticking
++            }
+         }
+ 
+         profilerFiller.pop();

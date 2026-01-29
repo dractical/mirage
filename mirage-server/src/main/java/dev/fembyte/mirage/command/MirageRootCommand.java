@@ -50,6 +50,10 @@ public final class MirageRootCommand extends Command {
         }
 
         if (!current.children().isEmpty() && index == args.length) {
+            MirageSubcommandInfo info = current.info();
+            if (info != null && info.handler().runWhenHasChildren()) {
+                info.handler().execute(sender, new String[0]);
+            }
             sendHelp(sender, current);
             return true;
         }
